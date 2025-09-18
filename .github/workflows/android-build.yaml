@@ -26,14 +26,17 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Build Debug APK
-      run: ./gradlew assembleDebug
+    - name: Verify Gradle Wrapper
+      run: |
+        ls -l gradle/wrapper/
+        file gradle/wrapper/gradle-wrapper.jar
 
-    - name: List Contents of APK directory
-      run: ls -l app/build/outputs/apk/debug/
+    - name: Build Debug APK with Verbose Logging
+      run: ./gradlew assembleDebug --stacktrace --info
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
         name: app-debug-apk
         path: app/build/outputs/apk/debug/app-debug.apk
+      if: success() || failure()
