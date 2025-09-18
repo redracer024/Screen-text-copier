@@ -5,41 +5,42 @@ name: Build APK
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: 'gradle'
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
 
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v2
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
 
-    - name: Accept Android SDK licenses
-      run: |
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+      - name: Accept Android SDK licenses
+        run: |
+          mkdir -p "$ANDROID_HOME/licenses"
+          echo -e "\n8933bad161af4178b11852feb10044517ae7a685\n24333d8a63b6825ea9c5514f835c2829b0049221\n65aa1a04d22d250f249e7b2323a63b6825ea9c5514f835c2829b0049221" > "$ANDROID_HOME/licenses/android-sdk-license"
+          echo -e "\nd56f5187479451eabf01217e4f3a9e6659648973" >> "$ANDROID_HOME/licenses/android-googletv-license"
+          echo -e "\n342503254483b8003665e1302881b29a490e525b" >> "$ANDROID_HOME/licenses/android-sdk-license"
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-    - name: Build Debug APK with Verbose Logging
-      run: ./gradlew clean assembleDebug --stacktrace --info
+      - name: Build Debug APK with Verbose Logging
+        run: ./gradlew clean assembleDebug --stacktrace --info
 
-    - name: List Contents of build directory
-      run: ls -lR app/build/outputs/
+      - name: List Contents of build directory
+        run: ls -lR app/build/outputs/
 
-    - name: Upload Debug APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-debug-apk
-        path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
